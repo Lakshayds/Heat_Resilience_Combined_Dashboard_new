@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heat Resilience Champions — Globe From Home</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fafbfc;--surf:#fff;--surf2:#f3f5f7;--tx:#1a1d23;--tx2:#4a5060;--tx3:#8590a0;--bdr:#e4e8ed;--navy:#14233c;--accent:#e8612d;--blue:#2570c0;--teal:#0d8a6a;--red:#c93030;--amber:#c07a10;--purple:#6a4fc0;--grn:#1a8a52}
+@media(prefers-color-scheme:dark){:root{--bg:#0d0f13;--surf:#161920;--surf2:#1c2028;--tx:#e2e5ea;--tx2:#9aa0b0;--tx3:#606878;--bdr:#262a35;--navy:#0d0f13}}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);line-height:1.65;-webkit-font-smoothing:antialiased}
+.w{max-width:1100px;margin:0 auto;padding:0 1.5rem}
+header{background:var(--navy);color:#fff;padding:1.6rem 0 0}
+header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+header .sub{font-size:.78rem;opacity:.55;margin-top:2px;font-weight:400}
+.tabs{display:flex;gap:0;margin-top:1.3rem}
+.tabs button{padding:.7rem 1.4rem;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.45);background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s}
+.tabs button:hover{color:rgba(255,255,255,.7)}
+.tabs button.on{color:#fff;border-bottom-color:var(--accent);background:rgba(255,255,255,.06)}
+.tc{display:none;padding:2rem 0 3rem}.tc.on{display:block}
+.hero{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bdr);border-radius:12px;overflow:hidden;margin:1.5rem 0 2.5rem}
+.hero-item{background:var(--surf);padding:1.2rem 1rem;text-align:center}
+.hero-item .val{font-size:1.6rem;font-weight:800;letter-spacing:-.03em}
+.hero-item .lbl{font-size:.72rem;color:var(--tx2);margin-top:2px}
+.hero-item .src-t{font-size:.58rem;color:var(--tx3);margin-top:6px}
+.hero-item .src-t a{color:var(--blue);text-decoration:none}
+.sec{margin-bottom:3rem}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:.4rem}
+.sec-num{font-size:.7rem;font-weight:700;color:var(--accent);background:rgba(232,97,45,.1);padding:3px 9px;border-radius:20px}
+.sec-title{font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
+.sec-desc{font-size:.84rem;color:var(--tx2);margin-bottom:1.2rem;max-width:800px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.card{background:var(--surf);border-radius:10px;padding:1.1rem 1.2rem;border:1px solid var(--bdr)}
+.card h4{font-size:.8rem;font-weight:600;margin-bottom:4px;color:var(--tx)}
+.card .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.68rem;color:var(--tx3);margin-bottom:6px}
+.card .legend .d{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle}
+.cw{position:relative;height:220px}
+.card .note{font-size:.6rem;color:var(--tx3);margin-top:6px;line-height:1.5}
+.card .note a{color:var(--blue);text-decoration:none}
+.stat{background:var(--surf);border-radius:10px;padding:1rem 1.1rem;border:1px solid var(--bdr);border-left:3px solid var(--bdr)}
+.stat.r{border-left-color:var(--red)}.stat.a{border-left-color:var(--amber)}.stat.b{border-left-color:var(--blue)}
+.stat.t{border-left-color:var(--teal)}.stat.p{border-left-color:var(--purple)}.stat.g{border-left-color:var(--grn)}.stat.o{border-left-color:var(--accent)}
+.stat .region{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx3);margin-bottom:4px}
+.stat .val{font-size:1.2rem;font-weight:800;margin-bottom:3px;letter-spacing:-.02em}
+.stat .desc{font-size:.76rem;color:var(--tx2);line-height:1.55}
+.stat .cite{font-size:.58rem;color:var(--tx3);margin-top:8px;padding-top:6px;border-top:1px solid var(--bdr)}
+.stat .cite a{color:var(--blue);text-decoration:none}
+.compare{display:grid;grid-template-columns:1fr auto 1fr;gap:0;background:var(--surf);border-radius:10px;border:1px solid var(--bdr);overflow:hidden;margin-top:14px}
+.compare .side{padding:1rem 1.2rem;text-align:center}
+.compare .vs{display:flex;align-items:center;padding:0 .8rem;font-size:.7rem;font-weight:700;color:var(--tx3);background:var(--surf2)}
+.compare .side .val{font-size:1.3rem;font-weight:800}
+.compare .side .lbl{font-size:.72rem;color:var(--tx2);margin-top:2px}
+.compare .side .sub{font-size:.6rem;color:var(--tx3);margin-top:4px}
+.compare .side .sub a{color:var(--blue);text-decoration:none}
+.callout{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:1.4rem 1.6rem;margin:2rem 0}
+.callout h3{font-size:.95rem;font-weight:700;margin-bottom:10px;color:var(--accent)}
+.callout p{font-size:.84rem;color:var(--tx2);line-height:1.8;margin-bottom:.7rem}
+.callout p:last-child{margin-bottom:0}
+.experts{background:var(--surf2);border-radius:10px;padding:1rem 1.3rem;font-size:.74rem;color:var(--tx2);line-height:1.8;margin-top:1.5rem}
+.experts strong{color:var(--tx)}.experts a{color:var(--blue);text-decoration:none}
+.placeholder{text-align:center;padding:5rem 2rem;color:var(--tx3)}
+.placeholder h2{font-size:1.2rem;color:var(--tx2);margin-bottom:.5rem}
+footer{border-top:1px solid var(--bdr);padding:1.2rem 0;font-size:.68rem;color:var(--tx3);text-align:center;margin-top:1rem}
+footer a{color:var(--blue);text-decoration:none}
+.subtabs{display:flex;gap:0;margin:1.2rem 0 1.5rem;border-bottom:1px solid var(--bdr)}
+.subtabs button{padding:.55rem 1.1rem;font-size:.74rem;font-weight:600;color:var(--tx3);background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s}
+.subtabs button:hover{color:var(--tx2)}
+.subtabs button.son{color:var(--accent);border-bottom-color:var(--accent);background:rgba(232,97,45,.04)}
+.region-panel{display:none}.region-panel.son{display:block}
+@media(max-width:768px){.hero{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}.tabs button{font-size:.72rem;padding:.55rem .8rem}.subtabs button{font-size:.66rem;padding:.45rem .6rem}}
+</style>
+</head>
+<body>
+<header><div class="w">
+  <h1>Heat Resilience Champions</h1>
+  <div class="sub">Impact Measurement Dashboard &middot; Globe From Home Social Impact Foundation</div>
+  <nav class="tabs">
+    <button class="on" onclick="go('action',this)">Case for action</button>
+    <button onclick="go('solutions',this)">Solutions evidence</button>
+    <button onclick="go('impact',this)">Programme impact</button>
+    <button onclick="go('country',this)">Country view</button>
+  </nav>
+</div></header>
+
+<div id="action" class="tc on"><div class="w">
+<div class="hero">
+  <div class="hero-item"><div class="val">546,000</div><div class="lbl">People killed by heat every year</div><div class="src-t">Lancet Countdown 2025</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--red)">$1.09T</div><div class="lbl">Lost annually in worker productivity</div><div class="src-t"><a href="https://www.ilo.org/publications/heat-work-implications-safety-and-health" target="_blank">ILO, Heat at Work 2024</a></div></div>
+  <div class="hero-item"><div class="val">2.41B</div><div class="lbl">Workers exposed to dangerous heat</div><div class="src-t"><a href="https://www.ilo.org/publications/heat-work-implications-safety-and-health" target="_blank">ILO, Heat at Work 2024</a></div></div>
+  <div class="hero-item"><div class="val" style="color:var(--accent)">11 of 100</div><div class="lbl">Major cities with any heat plan</div><div class="src-t"><a href="https://www.apha.org/publications/public-health-newswire/public-health-newswire/articles/cities-nations-need-a-plan-for-extreme-weather" target="_blank">APHA / Bishai 2025</a></div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Heat kills more people than any other weather event</span></div>
+  <div class="sec-desc">The <a href="https://www.who.int/news-room/fact-sheets/detail/climate-change-heat-and-health" target="_blank" style="color:var(--blue)">WHO calls heat a "silent killer."</a> Most victims never appear in official statistics because heat triggers heart attacks, kidney failure, and respiratory collapse that get recorded under other causes. Researchers estimate the true toll is <a href="https://e360.yale.edu/features/kristie-ebi-interview" target="_blank" style="color:var(--blue)">2 to 10 times higher</a> than what gets reported.</div>
+  <div class="g2">
+    <div class="card"><h4>Three consecutive deadly summers in Europe</h4><div class="legend"><span><span class="d" style="background:var(--red)"></span>Heat-attributed deaths (32 countries, 654 regions)</span></div><div class="cw"><canvas id="ch1"></canvas></div><div class="note">Over 181,000 heat deaths across three summers. <a href="https://www.nature.com/articles/s41591-025-03954-7" target="_blank">ISGlobal / Nature Medicine, Sep 2025</a></div></div>
+    <div class="card"><h4>The underreporting gap: US reported vs actual deaths</h4><div class="legend"><span><span class="d" style="background:var(--accent)"></span>Officially reported</span><span><span class="d" style="background:rgba(232,97,45,.2)"></span>Estimated actual (excess mortality analysis)</span></div><div class="cw"><canvas id="ch2"></canvas></div><div class="note">Official records capture less than half the real toll. <a href="https://jamanetwork.com/journals/jama/fullarticle/2824549" target="_blank">JAMA 2024</a>; <a href="https://ysph.yale.edu/news-article/warming-us-climate-linked-to-rising-deaths-from-heat/" target="_blank">Yale SPH 2025</a></div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">No country is safe: recent heat events across the world</span></div>
+  <div class="sec-desc">This is not a problem limited to any one region. From European capitals to the Hajj pilgrimage, from Bangladeshi classrooms to Spanish cities, heat is causing mass casualties everywhere. The difference is in how visible the deaths are.</div>
+
+  <div class="g2">
+    <div class="card"><h4>Where heat kills: global regional share</h4><div class="legend"><span><span class="d" style="background:var(--red)"></span>Asia 45%</span><span><span class="d" style="background:var(--blue)"></span>Europe 36%</span><span><span class="d" style="background:var(--amber)"></span>Rest of world 19%</span></div><div class="cw"><canvas id="ch3"></canvas></div><div class="note">Asia has 60% of the world's population but only 45% of recorded heat deaths, pointing to massive underreporting. <a href="https://www.thelancet.com/journals/eclinm/article/PIIS2589-5370(24)00444-9/fulltext" target="_blank">eClinicalMedicine / Lancet 2024</a></div></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat r"><div class="region">Europe, summer 2024</div><div class="val">62,775 deaths</div><div class="desc">Across 32 countries in a single summer. 23.6% higher than the previous year, and part of a trend that saw over 181,000 heat deaths across three consecutive European summers.</div><div class="cite"><a href="https://www.nature.com/articles/s41591-025-03954-7" target="_blank">ISGlobal / Nature Medicine, Sep 2025</a></div></div>
+      <div class="stat r"><div class="region">Saudi Arabia, June 2024</div><div class="val">1,301 pilgrims killed</div><div class="desc">During the Hajj in temperatures exceeding 51.8 degrees C. 83% were unregistered pilgrims without access to air-conditioned facilities.</div><div class="cite"><a href="https://academic.oup.com/jtm/article/31/6/taae096/7712791" target="_blank">Memish et al. 2024, Journal of Travel Medicine</a></div></div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top:14px">
+    <div class="stat r"><div class="region">Spain, summer 2024</div><div class="val">6,743 deaths</div><div class="desc">Down from 11,324 in 2022 but still devastating despite years of adaptation efforts. Heat mortality remains persistent even in countries that are actively responding.</div><div class="cite">ISCIII MoMo Mortality Monitoring System, Spain</div></div>
+    <div class="stat a"><div class="region">Bangladesh, 2024</div><div class="val">33,000 schools closed</div><div class="desc">18 million children affected. Heat is not just a health crisis. It is shutting down education systems in some of the most climate-vulnerable countries.</div><div class="cite">Bangladesh Ministry of Education / UNICEF 2024</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">The economic destruction</span></div>
+  <div class="sec-desc">Heat does not just kill people. It makes work impossible. At 32 degrees C, physical labour capacity drops by approximately 40%. At 38 degrees C, it drops by two-thirds. The poorest regions pay the highest price.</div>
+  <div class="g2">
+    <div class="card"><h4>How productivity collapses as temperature rises</h4><div class="legend"><span><span class="d" style="background:var(--red)"></span>Physical labour productivity loss</span></div><div class="cw"><canvas id="ch4"></canvas></div><div class="note">Anchor data points (32 degrees C and 38 degrees C) from <a href="https://link.springer.com/article/10.1007/s00484-021-02105-6" target="_blank">Foster et al. 2021, Int J Biometeorol</a> via <a href="https://www.allianz.com/content/dam/onemarketing/azcom/Allianz_com/economic-research/publications/specials/en/2025/july/20250701_Heatwaves_EconImplications.pdf" target="_blank">Allianz Research 2025</a>. Intermediate points are interpolated.</div></div>
+    <div class="card"><h4>The poorest lose the most: GDP impact by income level</h4><div class="legend"><span><span class="d" style="background:var(--red)"></span>Darker = poorer regions. Poorest lose 2.3x more than richest.</span></div><div class="cw"><canvas id="ch5"></canvas></div><div class="note">Cumulative losses 1992 to 2013: $16 to $50 trillion. <a href="https://www.science.org/doi/10.1126/sciadv.add3726" target="_blank">Callahan &amp; Mankin, Science Advances 2022</a></div></div>
+  </div>
+  <div class="g3" style="margin-top:14px">
+    <div class="stat a"><div class="region">Global projection</div><div class="val">$2.4 Trillion/yr</div><div class="desc">Projected annual productivity losses by 2030 at 1.5 degrees C warming. Conservative estimate: assumes all work carried out in shade.</div><div class="cite"><a href="https://www.ilo.org/resource/news/increase-heat-stress-predicted-bring-productivity-loss-equivalent-80" target="_blank">ILO, Working on a Warmer Planet 2019</a></div></div>
+    <div class="stat a"><div class="region">Global projection</div><div class="val">80 million full-time jobs</div><div class="desc">Equivalent working hours lost globally by 2030 from heat stress. That is 2.2% of all working hours worldwide.</div><div class="cite"><a href="https://www.ilo.org/resource/news/increase-heat-stress-predicted-bring-productivity-loss-equivalent-80" target="_blank">ILO, Working on a Warmer Planet 2019</a></div></div>
+    <div class="stat a"><div class="region">Global, 2021</div><div class="val">470 billion labour hours</div><div class="desc">Already lost to heat exposure in a single year. A 37% increase from the 1990s annual average. Two-thirds of losses were in agriculture.</div><div class="cite">Lancet Countdown on Health and Climate Change 2022</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Who suffers most: workers and children</span></div>
+  <div class="sec-desc">Heat does not affect everyone equally. Outdoor workers, children walking to school, and people in informal settlements face the greatest exposure with the fewest protections.</div>
+  <div class="g2">
+    <div><h4 style="font-size:.82rem;font-weight:600;margin-bottom:10px;color:var(--blue)">Workers</h4><div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat b"><div class="val">940 million in agriculture</div><div class="desc">The sector will account for 60% of all working hours lost to heat stress by 2030. Most agricultural workers have no shade, no mandated breaks, and no legal heat protection.</div><div class="cite"><a href="https://www.ilo.org/resource/news/increase-heat-stress-predicted-bring-productivity-loss-equivalent-80" target="_blank">ILO, Working on a Warmer Planet 2019</a></div></div>
+      <div class="stat b"><div class="val">22.85 million injuries per year</div><div class="desc">Occupational injuries attributable to excessive heat globally, plus 18,970 deaths. 80% occur outside of official heatwave periods.</div><div class="cite"><a href="https://www.ilo.org/publications/heat-work-implications-safety-and-health" target="_blank">ILO, Heat at Work 2024</a></div></div>
+      <div class="stat b"><div class="val">26.2 million with kidney disease</div><div class="desc">People living with chronic kidney disease caused by heat stress at work. Concentrated among agricultural and construction workers in low-income countries.</div><div class="cite"><a href="https://www.ilo.org/publications/heat-work-implications-safety-and-health" target="_blank">ILO, Heat at Work 2024</a></div></div>
+    </div></div>
+    <div><h4 style="font-size:.82rem;font-weight:600;margin-bottom:10px;color:var(--purple)">Children</h4><div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat p"><div class="val">200 million</div><div class="desc">Children currently living in extreme high heat zones worldwide.</div><div class="cite"><a href="https://www.unicef.org/reports/coldest-year-rest-of-their-lives-children-heatwaves" target="_blank">UNICEF, The Coldest Year 2022</a></div></div>
+      <div class="stat p"><div class="val">21% score drop</div><div class="desc">Learning outcomes decline when students study and take exams in high heat.</div><div class="cite"><a href="https://www.nature.com/articles/s41562-020-00959-9" target="_blank">Park et al. 2020, Nature Human Behaviour</a></div></div>
+      <div class="stat p"><div class="val">84% of schools</div><div class="desc">In the Global South lack any cooling. 559 million children walk to school in extreme heat.</div><div class="cite"><a href="https://www.unicef.org/press-releases/nearly-quarter-billion-childrens-schooling-was-disrupted-climate-crises-2024-unicef" target="_blank">UNESCO / UNICEF 2024</a>; UNICEF Safe to School 2024</div></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Proof that action saves lives</span></div>
+  <div class="sec-desc">The question is not whether we can reduce heat deaths. Ahmedabad proved we can. The question is why only 11 of the world's 100 largest cities have tried.</div>
+  <div class="g2">
+    <div><div class="stat g" style="margin-bottom:14px"><div class="region">Ahmedabad, India</div><div class="val">1,190 lives saved per year</div><div class="desc">South Asia's first Heat Action Plan (2013). Combines early warning, public awareness, health training, and cool roofs. Replicated in 30+ Indian cities. Recognised globally by UNFCCC.</div><div class="cite"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6236972/" target="_blank">Hess et al. 2018</a>; <a href="https://aaqr.org/articles/aaqr-22-08-le-0300" target="_blank">AAQR 2022</a></div></div>
+      <div class="card"><h4>Heat stroke deaths: before and after the plan</h4><div class="legend"><span><span class="d" style="background:var(--blue)"></span>Before (2010)</span><span><span class="d" style="background:var(--grn)"></span>After HAP (2013+)</span></div><div class="cw" style="height:170px"><canvas id="ch6"></canvas></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat t"><div class="region">Early warnings + education</div><div class="val">65 to 3 deaths</div><div class="desc">Ahmedabad's combined early warning system and community education programme reduced annual heat stroke deaths from 65 to 3.</div><div class="cite"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6236972/" target="_blank">Hess et al. 2018, Environmental Health Perspectives</a></div></div>
+      <div class="stat t"><div class="region">Cool roofs</div><div class="val">~3 degrees C indoor drop</div><div class="desc">Solar reflective paint on slum rooftops reduces indoor temperatures by approximately 3 degrees C. Over 20,000 homes treated in Ahmedabad.</div><div class="cite"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7227734/" target="_blank">Vellingiri et al. 2020, Indian J Occup Environ Med</a></div></div>
+      <div class="stat t"><div class="region">11 of 100 cities</div><div class="val">Have any heat action plan</div><div class="desc">Out of the world's 100 largest cities, only 11 have any kind of heat health action plan. The other 89 have nothing. Low-cost cooling shelters, schedule changes, and public awareness need no new infrastructure.</div><div class="cite"><a href="https://www.apha.org/publications/public-health-newswire/public-health-newswire/articles/cities-nations-need-a-plan-for-extreme-weather" target="_blank">APHA / Bishai 2025</a></div></div>
+      <div class="stat t"><div class="region">Medellin</div><div class="val">30% biodiversity boost</div><div class="desc">Green corridors reduced temperatures while improving urban ecosystems.</div><div class="cite">C40 Cities / Medellin Green Corridors Evaluation 2023</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">Where this is heading without action</span></div>
+  <div class="g2">
+    <div class="card"><h4>Deaths and economic cost: projected trajectory</h4><div class="legend"><span><span class="d" style="background:var(--red)"></span>Deaths (millions/yr)</span><span><span class="d" style="background:var(--amber)"></span>Economic cost ($T/yr)</span></div><div class="cw" style="height:240px"><canvas id="ch7"></canvas></div><div class="note">Lancet Countdown 2025; <a href="https://www.nature.com/articles/s41586-024-07147-z" target="_blank">Nature 2024</a>; Swiss Re Sigma 2024</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat o"><div class="region">By 2050</div><div class="val">970 cities above 35 degrees C</div><div class="desc">For 30+ days per year. Up from ~350 today.</div><div class="cite"><a href="https://www.c40.org/news/global-cities-unite-to-tackle-the-risks-of-extreme-heat/" target="_blank">C40 Cool Cities Accelerator</a></div></div>
+      <div class="stat o"><div class="region">By 2050</div><div class="val">3.5 billion workers exposed</div><div class="desc">A 45% increase from today's 2.41 billion.</div><div class="cite"><a href="https://www.ilo.org/publications/heat-work-implications-safety-and-health" target="_blank">ILO, Heat at Work 2024</a></div></div>
+      <div class="stat o"><div class="region">By 2050</div><div class="val">2 billion children at risk</div><div class="desc">Facing annual heatwave exposure across all climate scenarios.</div><div class="cite"><a href="https://www.unicef.org/reports/coldest-year-rest-of-their-lives-children-heatwaves" target="_blank">UNICEF, The Coldest Year 2022</a></div></div>
+      <div class="stat o"><div class="region">By 2100</div><div class="val">$7.9 trillion per year</div><div class="desc">Total cost of inaction including productivity, health, and infrastructure.</div><div class="cite">Swiss Re Sigma Report 2024</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">07</span><span class="sec-title">The gap we exist to fill</span></div>
+  <div class="sec-desc">The countries that need heat protection the most are getting almost none of the funding they need. But when that funding does arrive, it works incredibly well.</div>
+  <div class="compare">
+    <div class="side"><div class="val" style="color:var(--red)">90% unfunded</div><div class="lbl">Low-income countries need billions to protect their people from heat. Right now, only 10% of that need is being met. The other 90% is a gap that leaves communities exposed.</div><div class="sub"><a href="https://www.climateworks.org/programs/adaptation-and-resilience/fund/" target="_blank">ClimateWorks / UNEP 2025</a></div></div>
+    <div class="vs">but</div>
+    <div class="side"><div class="val" style="color:var(--grn)">$2 to $42 back</div><div class="lbl">For every $1 spent on heat adaptation, communities get between $2 and $42 back in avoided deaths, preserved productivity, and reduced healthcare costs. The return on investment is enormous.</div><div class="sub"><a href="https://www.rockefellerfoundation.org/news/foundations-launch-50-million-adaptation-and-resilience-fund-for-communities-facing-climate-risks/" target="_blank">Rockefeller Foundation 2025</a></div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">08</span><span class="sec-title">What this means for Globe From Home</span></div>
+  <div class="callout" style="margin-top:.8rem">
+  <p>Heat kills nearly 550,000 people every year. It wipes out over a trillion dollars in productivity. It closes tens of thousands of schools, cripples agriculture, and hits the poorest communities hardest. By 2050, over a million people could die annually and 970 cities will regularly exceed 35 degrees.</p>
+  <p>But structured interventions work. Ahmedabad's Heat Action Plan reduced heat stroke deaths from 65 to 3 per year and saves an estimated 1,190 lives annually. Cool roofs reduce indoor temperatures by around 3 degrees C in slum housing. These are documented, peer-reviewed, and ready to scale.</p>
+  <p>What is missing is the layer that activates everything else: community education. Cooling centres sit empty if people do not know they exist. Warnings fail if communities do not understand what to do. Cool roofs do not get adopted if households do not see the value. Education is the multiplier. That is what Globe From Home delivers through live-streamed, empathy-driven experiences that connect learners to the realities of heat and move them to action.</p>
+</div>
+</div>
+
+<div class="sec" style="margin-top:2.5rem">
+  <div class="sec-title" style="color:var(--blue)">About the data behind this dashboard</div>
+  <div class="callout" style="margin-top:.8rem">
+    <p>We built this dashboard using only peer-reviewed research, official UN and government agency reports, and data from recognised global partnerships. No blog posts, no opinion pieces, no unverified claims. Here is a quick guide to the key sources and why we picked each one.</p>
+    <p>For <strong>mortality data</strong>, we draw primarily from two studies. The <a href="https://www.nature.com/articles/s41591-025-03954-7" target="_blank" style="color:var(--blue)">ISGlobal study published in Nature Medicine (2025)</a> covers heat deaths across 654 regions in 32 European countries over three consecutive summers. We chose it because it is the most rigorous, most current study of its kind and gives us year-on-year trends rather than a single snapshot. The headline global figure of 546,000 annual deaths comes from the Lancet Countdown 2025 report, which is the most widely referenced annual tracker of climate and health globally.</p>
+    <p>For <strong>economic impact</strong>, we rely on <a href="https://www.nature.com/articles/s41586-024-07147-z" target="_blank" style="color:var(--blue)">Zhao et al. in Nature (2024)</a> because it is the first study to model not just direct productivity loss but also the ripple effects through global supply chains. Most economic estimates miss these indirect costs, which means they understate the real damage. We also use ILO data for worker-specific figures and the <a href="https://www.jec.senate.gov/public/index.cfm/democrats/2023/8/the-mounting-costs-of-extreme-heat" target="_blank" style="color:var(--blue)">US Joint Economic Committee (2023)</a> for American context, because many of our target funders are US-based and respond to data from their own backyard.</p>
+    <p>For the <strong>inequality angle</strong>, <a href="https://www.science.org/doi/10.1126/sciadv.add3726" target="_blank" style="color:var(--blue)">Callahan and Mankin in Science Advances (2022)</a> is our primary source. It demonstrates that the poorest regions lose over twice as much GDP per capita from heat as the richest. This is the data point that connects our work to the climate justice narrative that equity-focused funders prioritise.</p>
+    <p>For <strong>proof that interventions work</strong>, the Ahmedabad Heat Action Plan is our anchor case study, documented in <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6236972/" target="_blank" style="color:var(--blue)">Hess et al. (2018)</a> and <a href="https://aaqr.org/articles/aaqr-22-08-le-0300" target="_blank" style="color:var(--blue)">AAQR (2022)</a>. It remains the most rigorously evaluated heat action plan in the developing world, with clear before-and-after mortality data.</p>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-title" style="color:var(--blue)">Reading the numbers</div>
+  <div class="callout" style="margin-top:.8rem">
+    <p>A few things to keep in mind when looking at the data on this dashboard.</p>
+    <p><strong>Reported vs actual deaths.</strong> Throughout this dashboard you will see two types of death figures. "Reported" or "official" numbers are what appears on death certificates, where a doctor has specifically coded heat as the cause. "Estimated actual" or "excess mortality" numbers come from a different method: researchers look at how many people died during a heat event compared to how many would normally die during that same period, and the difference is the estimated heat toll. The second method captures all the cardiac arrests, kidney failures, and respiratory collapses that heat caused but that were not coded as heat deaths. This is why estimated figures are always significantly higher than official ones.</p>
+    <p><strong>Economic projections.</strong> The cost figures on this dashboard range from $1.09 trillion today to $24.7 trillion by 2100. That wide range reflects different emissions scenarios. We show the spectrum rather than a single number so readers can see both the trajectory we are on and what could change with intervention. Where a single figure is shown, we have used the more conservative estimate.</p>
+    <p><strong>The Ahmedabad numbers.</strong> We reference two different figures for Ahmedabad: heat stroke deaths (which dropped from 65 to 3) and total lives saved (~1,190 per year). These come from different analyses. The heat stroke count tracks specific diagnosed cases at hospitals. The 1,190 figure comes from a broader epidemiological study comparing all-cause excess mortality during heat season before and after the plan. Both point to the same conclusion.</p>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-title" style="color:var(--blue)">How current is this data?</div>
+  <div class="callout" style="margin-top:.8rem">
+    <p>We have used the most recent published data available for every metric as of March 2026. Here is what that means in practice.</p>
+    <p>The <strong>European mortality figures</strong> (2022 to 2024) come from a study published in September 2025 covering through summer 2024. Summer 2025 data will likely appear in late 2026. The <strong>global 546,000 figure</strong> is from Lancet Countdown 2025, which updated the previous estimate of 489,000 that covered 2000 to 2019.</p>
+    <p>The <strong>US data</strong> runs through 2023 for reported deaths (JAMA 2024) and through 2020 for excess mortality estimates (Yale SPH 2025). The <strong>Ahmedabad case study</strong> has detailed published data through 2018, though the programme itself continues to operate and update annually.</p>
+    <p>For <strong>future updates</strong>, the Lancet Countdown publishes new figures every October or November. The UNEP Frontiers report updates regularly. Both are worth checking before any major funder presentation. If you need city-level data more recent than what is published, the Ahmedabad Municipal Corporation and the C40 Cool Cities Accelerator network are the best sources to reach out to directly.</p>
+  </div>
+</div>
+
+<div class="experts">
+  <strong>Expert and institutional references guiding this work:</strong><br>
+  <a href="https://hsph.harvard.edu/profile/barrak-alahmad/" target="_blank">Dr. Barrak Alahmad</a>, Harvard T.H. Chan School of Public Health &bull;
+  <a href="https://hsph.harvard.edu/profile/robert-meade/" target="_blank">Dr. Robert Meade</a>, Harvard T.H. Chan School of Public Health &bull;
+  <a href="https://ghsm.hms.harvard.edu/faculty-staff/satchit-balsari-md-mph" target="_blank">Dr. Satchit Balsari</a>, Harvard Medical School &bull;
+  Laurie Goering, Climate Resilience &bull;
+  <a href="https://www.who.int/news-room/fact-sheets/detail/climate-change-heat-and-health" target="_blank">WHO: Heat and Health Fact Sheet</a>
+</div>
+</div></div>
+
+<div id="solutions" class="tc"><div class="w">
+
+<div style="margin-top:1.5rem;margin-bottom:2rem">
+  <div class="sec-title" style="font-size:1.3rem;margin-bottom:.3rem">What works: evidence-backed solutions</div>
+  <div class="sec-desc">Each intervention below is grounded in peer-reviewed research and real-world implementation. Organised around Globe From Home's workshop programme, drawing on <a href="https://drawdown.org/solutions" target="_blank" style="color:var(--blue)">Project Drawdown</a>, Ahmedabad HAP data, and field evidence from partner cities.</div>
+</div>
+
+<!-- Solution 1 -->
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="sec-num">01</span><h4 style="font-size:.95rem;margin:0">Personal heat response (first line of defence)</h4></div>
+  <div class="g2" style="gap:12px">
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">What it is</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.7">Training individuals to recognise heat illness symptoms, take protective action (hydration, shade-seeking, modified work schedules), administer basic first aid for heat stroke, and share knowledge with family and community. This is the "first line of defence" that Rajeev identified as foundational to the programme.</div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">Evidence of effectiveness</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="stat g"><div class="val" style="font-size:1rem">Heat stroke deaths: 65 to 3</div><div class="desc">Ahmedabad's Heat Action Plan, which combines early warnings with community education and health worker training, reduced annual heat stroke deaths from 65 (2010) to just 3 (2018).</div><div class="cite"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6236972/" target="_blank">Hess et al. 2018, Environmental Health Perspectives</a></div></div>
+        <div class="stat g"><div class="val" style="font-size:1rem">Up to 80% fatality if untreated</div><div class="desc">Heat stroke is a medical emergency. Mortality reaches 80% without prompt cooling and treatment. Basic first response knowledge (recognising symptoms, rapid cooling, calling for help) is the difference between life and death.</div><div class="cite"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10227888/" target="_blank">Sheraton et al. 2023, BJA Education</a></div></div>
+        <div class="stat g"><div class="val" style="font-size:1rem">70%+ awareness post-outreach</div><div class="desc">Ahmedabad's community campaigns raised heat illness awareness from under 30% to above 70% in targeted communities.</div><div class="cite"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4024996/" target="_blank">Knowlton et al. 2014, IIPH-G / Ahmedabad HAP</a></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:4px">Expected outcomes from Globe From Home workshops</div>
+    <div style="font-size:.8rem;color:var(--tx2)">25 to 40% of participants adopt 3+ protective behaviours within 90 days. Each trained person shares knowledge with an average of 12 additional family and community members (4 household + 8 community), creating a cascade multiplier effect.</div>
+  </div>
+</div>
+
+<!-- Solution 2 -->
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="sec-num">02</span><h4 style="font-size:.95rem;margin:0">Cool roofs</h4></div>
+  <div class="g2" style="gap:12px">
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">What it is</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.7">Applying solar-reflective paint or materials to rooftops, particularly in low-income and slum housing. Reflects sunlight rather than absorbing it, reducing indoor temperatures without electricity or air conditioning. One of the most cost-effective heat interventions available.</div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">Evidence of effectiveness</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="stat t"><div class="val" style="font-size:1rem">~3 degrees C indoor reduction</div><div class="desc">Measured in Ahmedabad slum housing after solar reflective white paint application. Pilot covered 3,000+ low-income homes through Mahila Housing Trust.</div><div class="cite"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7227734/" target="_blank">Vellingiri et al. 2020, Indian J Occup Environ Med</a></div></div>
+        <div class="stat t"><div class="val" style="font-size:1rem">3 to 6 degrees C in field reports</div><div class="desc">Broader field reports from 20,000+ homes treated with cool roof technology across Ahmedabad slums show indoor reductions of 3 to 6 degrees C depending on roof material.</div><div class="cite">Mahila Housing Trust / NRDC field data 2024</div></div>
+        <div class="stat t"><div class="val" style="font-size:1rem">20 to 40% cooling energy savings</div><div class="desc">Cool roofs reduce indoor temperatures enough to significantly cut air conditioning demand. In buildings with AC, this translates to measurable energy and emissions savings.</div><div class="cite"><a href="https://www.nrdc.org/sites/default/files/ahmedabad-heat-action-plan-2016.pdf" target="_blank">NRDC / Ahmedabad Heat Action Plan 2016</a></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:4px">Expected outcomes</div>
+    <div style="font-size:.8rem;color:var(--tx2)">Target: 80 m2 of cool roof per trained champion. At a deployment rate of 65% (based on Ahmedabad's community health worker activation rate of 60 to 70%), each cohort of 500 champions creates 26,000 m2 of cool roof surface and avoids approximately 65 tonnes of CO2 per year.</div>
+  </div>
+</div>
+
+<!-- Solution 3 -->
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="sec-num">03</span><h4 style="font-size:.95rem;margin:0">Urban gardens and green corridors</h4></div>
+  <div class="g2" style="gap:12px">
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">What it is</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.7">Establishing community gardens, tree canopy, and green corridors in urban heat islands. Vegetation cools through evapotranspiration and shade, while also providing food security, biodiversity, air quality, and community gathering benefits.</div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">Evidence of effectiveness</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="stat g"><div class="val" style="font-size:1rem">1.2 degrees C per 10% canopy increase</div><div class="desc">Ambient temperature reduction for every 10% increase in urban tree canopy coverage.</div><div class="cite"><a href="https://www.pnas.org/doi/10.1073/pnas.1817561116" target="_blank">Ziter et al. 2019, PNAS</a></div></div>
+        <div class="stat g"><div class="val" style="font-size:1rem">2 degrees C corridor cooling</div><div class="desc">Medellin's 36 green corridors reduced surrounding temperatures by approximately 2 degrees C while connecting fragmented urban ecosystems.</div><div class="cite">C40 Cities / Medellin Green Corridors programme data</div></div>
+        <div class="stat g"><div class="val" style="font-size:1rem">Most funded heat intervention globally</div><div class="desc">In a review of over 200 World Bank urban projects, green features (parks, trees, green spaces) were the single most common type of heat intervention, appearing in 48% of all heat-related projects. This makes greening the most bankable and scalable heat solution.</div><div class="cite"><a href="https://blogs.worldbank.org/en/sustainablecities/combating-heat-in-cities" target="_blank">World Bank, Combating Heat in Cities 2024</a></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:4px">Expected outcomes</div>
+    <div style="font-size:.8rem;color:var(--tx2)">Target: 22 community garden sites per pilot city. Expected 2.1 degrees C ambient cooling in surrounding area. Co-benefits include local food production, improved air quality, and community social cohesion.</div>
+  </div>
+</div>
+
+<!-- Solution 4 -->
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="sec-num">04</span><h4 style="font-size:.95rem;margin:0">School heat mapping and adaptation</h4></div>
+  <div class="g2" style="gap:12px">
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">What it is</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.7">Mapping heat exposure in and around schools to identify the hottest classrooms, routes, and outdoor areas. Using this data to drive adaptations: shade structures, schedule changes, hydration stations, and heat-aware teaching practices. Directly addresses the 33,000 school closures seen in Bangladesh and the 21% learning outcome decline documented in heat-exposed students.</div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">Evidence of effectiveness</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="stat p"><div class="val" style="font-size:1rem">Cumulative learning loss from heat</div><div class="desc">Each additional hot school day (above 32 degrees C) measurably reduces test scores. The effect compounds over the school year and disproportionately affects students without access to cooling.</div><div class="cite"><a href="https://www.nature.com/articles/s41562-020-00959-9" target="_blank">Park et al. 2020, Nature Human Behaviour</a></div></div>
+        <div class="stat p"><div class="val" style="font-size:1rem">559 million children exposed</div><div class="desc">To high heatwave frequency globally. Many in the Global South walk to school in extreme heat without shade or cooling infrastructure.</div><div class="cite"><a href="https://www.unicef.org/reports/coldest-year-rest-of-their-lives-children-heatwaves" target="_blank">UNICEF, The Coldest Year 2022</a></div></div>
+        <div class="stat p"><div class="val" style="font-size:1rem">242 million students disrupted</div><div class="desc">In 85 countries during 2024 alone. Heatwaves were the most common climate hazard causing school closures, affecting 118 million students in April alone.</div><div class="cite"><a href="https://www.unicef.org/press-releases/nearly-quarter-billion-childrens-schooling-was-disrupted-climate-crises-2024-unicef" target="_blank">UNICEF, Learning Interrupted 2025</a></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:4px">Expected outcomes</div>
+    <div style="font-size:.8rem;color:var(--tx2)">Target: 35 schools per pilot city mapped and adapted. Expected 15 to 17% attendance improvement during heat season. Heat mapping data becomes a reusable asset for city planners and education departments.</div>
+  </div>
+</div>
+
+<!-- Solution 5 -->
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="sec-num">05</span><h4 style="font-size:.95rem;margin:0">Solar-powered fans for schools</h4></div>
+  <div class="g2" style="gap:12px">
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">What it is</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.7">Installing solar-powered ventilation and cooling fans in classrooms. Provides immediate thermal relief without grid dependency or electricity cost, making it sustainable for schools in off-grid or energy-poor areas. Pairs with cool roofs and shade structures for compound cooling effect.</div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">Evidence of effectiveness</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="stat t"><div class="val" style="font-size:1rem">Global cooling demand tripling by 2050</div><div class="desc">Energy demand for space cooling is projected to triple by mid-century, mostly in developing countries. Solar-powered alternatives bypass grid dependency and recurring energy costs entirely.</div><div class="cite"><a href="https://www.iea.org/reports/the-future-of-cooling" target="_blank">IEA, The Future of Cooling 2018</a></div></div>
+        <div class="stat t"><div class="val" style="font-size:1rem">Air-conditioned schools offset 80% of heat's learning impact</div><div class="desc">Park et al. found that schools with air conditioning experienced roughly one-fifth of the learning loss compared to schools without any cooling. Even basic ventilation (fans, airflow) provides meaningful improvement.</div><div class="cite"><a href="https://www.nature.com/articles/s41562-020-00959-9" target="_blank">Park et al. 2020, Nature Human Behaviour</a></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:4px">Expected outcomes</div>
+    <div style="font-size:.8rem;color:var(--tx2)">Target: 35 schools equipped per pilot city. Combined with cool roofs and schedule adaptation, expected to maintain classroom temperatures within tolerable learning range during 90%+ of school hours in heat season.</div>
+  </div>
+</div>
+
+<!-- Solution 6 -->
+<div class="card" style="margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="sec-num">06</span><h4 style="font-size:.95rem;margin:0">Advocacy campaigns</h4></div>
+  <div class="g2" style="gap:12px">
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">What it is</div>
+      <div style="font-size:.82rem;color:var(--tx2);line-height:1.7">Training community leaders, parents, teachers, and local officials to advocate for heat-protective policies: workplace temperature limits, school schedule adjustments, public cooling infrastructure, and heat action plan adoption. This is how individual awareness becomes systemic change.</div>
+    </div>
+    <div>
+      <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:6px">Evidence of effectiveness</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="stat o"><div class="val" style="font-size:1rem">23 states, 130+ cities</div><div class="desc">Following Ahmedabad's model, India's NDMA is now working with 23 heat-prone states and over 130 cities and districts to develop and implement heat action plans. Community demand and political pressure drove this national scale-up.</div><div class="cite"><a href="https://eos.org/articles/specifically-tailored-action-plans-combat-heat-waves-in-india" target="_blank">Padmanaban 2021, Eos / AGU</a>; NRDC / IIPHG India programme</div></div>
+        <div class="stat o"><div class="val" style="font-size:1rem">33 founding cities</div><div class="desc">C40 launched the Cool Cities Accelerator in November 2025 with 33 founding cities and backing from Rockefeller Foundation. Growing political will means advocacy has receptive audiences.</div><div class="cite"><a href="https://www.c40.org/news/global-cities-unite-to-tackle-the-risks-of-extreme-heat/" target="_blank">C40 Cool Cities Accelerator 2025</a></div></div>
+        <div class="stat o"><div class="val" style="font-size:1rem">Most heat laws are too general</div><div class="desc">In most countries, existing workplace heat provisions fail to address the specific dangers workers face. Targeted advocacy for enforceable temperature limits, mandatory rest periods, and hydration access is the gap.</div><div class="cite"><a href="https://www.ilo.org/publications/heat-work-implications-safety-and-health" target="_blank">ILO, Heat at Work 2024</a></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bdr)">
+    <div style="font-size:.78rem;font-weight:600;color:var(--tx2);margin-bottom:4px">Expected outcomes</div>
+    <div style="font-size:.8rem;color:var(--tx2)">Target: 600 community advocates trained per pilot city. Expected to drive at least 1 local policy change per city within 12 months (workplace breaks, school schedule adjustments, or public cooling infrastructure). 28% reduction in heat symptoms in communities with active advocacy programmes.</div>
+  </div>
+</div>
+
+</div></div>
+<div id="impact" class="tc"><div class="w">
+
+<div style="margin-top:1.5rem;margin-bottom:.5rem">
+  <div class="sec-title" style="font-size:1.3rem;margin-bottom:.3rem">Programme impact</div>
+  <div class="sec-desc">Projected impact from pilot deployment. These are shells ready to be populated with real data as programmes launch. Current figures are modelled estimates based on Ahmedabad HAP outcomes, ILO productivity research, and Globe From Home programme design parameters.</div>
+</div>
+
+<!-- SECTION 1: Hero metrics -->
+<div class="hero" style="grid-template-columns:repeat(5,1fr)">
+  <div class="hero-item"><div class="val" style="color:var(--teal)">-3.6°C</div><div class="lbl">Avg indoor temperature reduction</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--grn)">-31%</div><div class="lbl">Heat illness symptoms</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--blue)">+17%</div><div class="lbl">School attendance</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--amber)">$95</div><div class="lbl">Annual savings per household</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--accent)">14,200</div><div class="lbl">People directly protected</div></div>
+</div>
+
+<!-- SECTION 2: Intervention breakdown -->
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Intervention breakdown</span></div>
+  <div style="overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-top:.8rem">
+    <thead><tr style="background:var(--navy);color:#fff">
+      <th style="padding:10px 12px;text-align:left;font-weight:600;border-radius:8px 0 0 0">Workshop</th>
+      <th style="padding:10px 12px;text-align:center;font-weight:600">Output</th>
+      <th style="padding:10px 12px;text-align:center;font-weight:600;border-radius:0 8px 0 0">Outcome</th>
+    </tr></thead>
+    <tbody>
+      <tr style="background:var(--surf);border-bottom:1px solid var(--bdr)">
+        <td style="padding:10px 12px;font-weight:600">Personal heat response</td>
+        <td style="padding:10px 12px;text-align:center">110 people trained</td>
+        <td style="padding:10px 12px;text-align:center;color:var(--grn);font-weight:600">-28% heat symptoms</td>
+      </tr>
+      <tr style="background:var(--surf2);border-bottom:1px solid var(--bdr)">
+        <td style="padding:10px 12px;font-weight:600">Cool roofs</td>
+        <td style="padding:10px 12px;text-align:center">180 roofs installed, 40 buildings treated</td>
+        <td style="padding:10px 12px;text-align:center;color:var(--teal);font-weight:600">-3.4°C indoor temperature</td>
+      </tr>
+      <tr style="background:var(--surf);border-bottom:1px solid var(--bdr)">
+        <td style="padding:10px 12px;font-weight:600">Solar-powered fans</td>
+        <td style="padding:10px 12px;text-align:center">35 schools equipped</td>
+        <td style="padding:10px 12px;text-align:center;color:var(--blue);font-weight:600">+15% attendance</td>
+      </tr>
+      <tr style="background:var(--surf2);border-bottom:1px solid var(--bdr)">
+        <td style="padding:10px 12px;font-weight:600">Urban gardens</td>
+        <td style="padding:10px 12px;text-align:center">22 sites established</td>
+        <td style="padding:10px 12px;text-align:center;color:var(--teal);font-weight:600">-2.1°C ambient cooling</td>
+      </tr>
+      <tr style="background:var(--surf)">
+        <td style="padding:10px 12px;font-weight:600;border-radius:0 0 0 8px">Advocacy training</td>
+        <td style="padding:10px 12px;text-align:center">600 people trained</td>
+        <td style="padding:10px 12px;text-align:center;color:var(--grn);font-weight:600;border-radius:0 0 8px 0">-28% symptoms in target communities</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- SECTION 2: Expected outcomes from workshops -->
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Expected outcomes from Globe From Home workshops</span></div>
+  <div class="sec-desc">Projected per-workshop outcomes based on Ahmedabad HAP data, field evidence from partner cities, and programme design parameters. These targets will be validated against real data as pilots launch.</div>
+
+  <div class="g2" style="gap:14px">
+    <div class="card" style="border-left:3px solid var(--grn)">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+        <h4 style="font-size:.82rem;margin:0">Personal heat response</h4>
+        <span style="font-size:1.1rem;font-weight:800;color:var(--accent);white-space:nowrap">1 &rarr; 13</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--tx2);line-height:1.7">25 to 40% of participants adopt 3+ protective behaviours within 90 days. Each trained person shares knowledge with an average of 12 additional family and community members (4 household + 8 community), creating a cascade multiplier effect.</div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--teal)">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+        <h4 style="font-size:.82rem;margin:0">Cool roofs</h4>
+        <span style="font-size:1.1rem;font-weight:800;color:var(--teal);white-space:nowrap">26,000 m&sup2;</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--tx2);line-height:1.7">Target: 80 m&sup2; of cool roof per trained champion. At a deployment rate of 65% (based on Ahmedabad's community health worker activation rate of 60 to 70%), each cohort of 500 champions creates 26,000 m&sup2; of cool roof surface and avoids approximately 65 tonnes of CO&sub2; per year.</div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--grn)">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+        <h4 style="font-size:.82rem;margin:0">Urban gardens</h4>
+        <span style="font-size:1.1rem;font-weight:800;color:var(--grn);white-space:nowrap">&minus;2.1&deg;C</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--tx2);line-height:1.7">Target: 22 community garden sites per pilot city. Expected 2.1 degrees C ambient cooling in surrounding area. Co-benefits include local food production, improved air quality, and community social cohesion.</div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--purple)">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+        <h4 style="font-size:.82rem;margin:0">School heat mapping</h4>
+        <span style="font-size:1.1rem;font-weight:800;color:var(--purple);white-space:nowrap">+15&ndash;17%</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--tx2);line-height:1.7">Target: 35 schools per pilot city mapped and adapted. Expected 15 to 17% attendance improvement during heat season. Heat mapping data becomes a reusable asset for city planners and education departments.</div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--blue)">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+        <h4 style="font-size:.82rem;margin:0">Solar-powered fans</h4>
+        <span style="font-size:1.1rem;font-weight:800;color:var(--blue);white-space:nowrap">90%+ hrs</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--tx2);line-height:1.7">Target: 35 schools equipped per pilot city. Combined with cool roofs and schedule adaptation, expected to maintain classroom temperatures within tolerable learning range during 90%+ of school hours in heat season.</div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--accent)">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+        <h4 style="font-size:.82rem;margin:0">Advocacy campaigns</h4>
+        <span style="font-size:1.1rem;font-weight:800;color:var(--accent);white-space:nowrap">600/city</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--tx2);line-height:1.7">Target: 600 community advocates trained per pilot city. Expected to drive at least 1 local policy change per city within 12 months (workplace breaks, school schedule adjustments, or public cooling infrastructure). 28% reduction in heat symptoms in communities with active advocacy programmes.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: Before vs After -->
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Longitudinal study: before vs after</span></div>
+  <div class="sec-desc">Visual comparisons modelled on the Ahmedabad evidence approach. These become our proof engine once pilot data flows in.</div>
+  <div class="g3">
+    <div class="card">
+      <h4>Indoor temperature</h4>
+      <div class="cw" style="height:200px"><canvas id="ba1"></canvas></div>
+      <div class="note">Target: 3.6°C average reduction through cool roofs + ventilation</div>
+    </div>
+    <div class="card">
+      <h4>School attendance during heat season</h4>
+      <div class="cw" style="height:200px"><canvas id="ba2"></canvas></div>
+      <div class="note">Target: 17% improvement through school cooling + schedule changes</div>
+    </div>
+    <div class="card">
+      <h4>Heat illness incidence</h4>
+      <div class="cw" style="height:200px"><canvas id="ba3"></canvas></div>
+      <div class="note">Target: 31% reduction through awareness + first response training</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: ROI -->
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Return on investment</span></div>
+  <div class="g3">
+    <div class="stat g"><div class="region">Cost efficiency</div><div class="val">$150 per household</div><div class="desc">Total programme cost per household reached, including training, materials, and cool roof installation.</div></div>
+    <div class="stat g"><div class="region">Impact efficiency</div><div class="val">$42 per degree C reduced</div><div class="desc">Cost per degree of indoor temperature reduction across the programme.</div></div>
+    <div class="stat g"><div class="region">Payback</div><div class="val">18 months</div><div class="desc">Average household payback period through energy savings ($95/year) against programme participation cost.</div></div>
+  </div>
+  <div class="compare" style="margin-top:14px">
+    <div class="side"><div class="val" style="color:var(--accent)">$150</div><div class="lbl">Our cost per household</div></div>
+    <div class="vs">vs</div>
+    <div class="side"><div class="val" style="color:var(--grn)">$95/yr</div><div class="lbl">Savings generated per household</div><div class="sub">Energy + healthcare + productivity</div></div>
+  </div>
+</div>
+
+<!-- SECTION 5: Vulnerable populations -->
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Who we reach: vulnerable populations</span></div>
+  <div class="sec-desc">Programme designed to prioritise the communities most exposed and least protected.</div>
+  <div class="g2">
+    <div class="card">
+      <h4>Target population breakdown</h4>
+      <div class="cw" style="height:220px"><canvas id="vp1"></canvas></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat p"><div class="val">45% children</div><div class="desc">School-age children in heat-affected areas. Primary beneficiaries of school cooling and heat mapping interventions.</div></div>
+      <div class="stat b"><div class="val">30% outdoor workers</div><div class="desc">Agricultural labourers, construction workers, street vendors. Most exposed, least protected.</div></div>
+      <div class="stat a"><div class="val">25% low-income households</div><div class="desc">Families in informal settlements and poorly insulated housing. Primary beneficiaries of cool roof programme.</div></div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+<div id="country" class="tc"><div class="w">
+
+<div style="margin-top:1.5rem;margin-bottom:0">
+  <div class="sec-title" style="font-size:1.3rem;margin-bottom:.3rem">Country and region view</div>
+  <div class="sec-desc">Each pilot region has its own mini-dashboard. Select a region below to view context, targets, and scale projections. Data will be populated as programmes launch.</div>
+</div>
+
+<nav class="subtabs">
+  <button class="son" onclick="goRegion('r_india',this)">India pilot</button>
+  <button onclick="goRegion('r_middleeast',this)">Middle East</button>
+  <button onclick="goRegion('r_phoenix',this)">Phoenix, Arizona</button>
+  <button onclick="goRegion('r_kerala',this)">Kerala</button>
+  <button onclick="goRegion('r_islands',this)">Small island nations</button>
+</nav>
+
+<!-- ==================== INDIA ==================== -->
+<div id="r_india" class="region-panel son">
+
+<div class="hero" style="grid-template-columns:repeat(4,1fr)">
+  <div class="hero-item"><div class="val">5,000</div><div class="lbl">Learners trained</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--purple)">120</div><div class="lbl">Schools impacted</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--teal)">-3.2°C</div><div class="lbl">Avg temperature reduction</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--blue)">+14%</div><div class="lbl">School attendance improvement</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Why India</span></div>
+  <div class="g3">
+    <div class="stat r"><div class="region">Mortality gap</div><div class="val">~110 official vs 1,100 to 11,000 estimated</div><div class="desc">India's heat death underreporting is among the worst globally. The gap between official and actual figures is a crisis in itself.</div><div class="cite">India Ministry of Health / Lancet</div></div>
+    <div class="stat a"><div class="region">Economic impact</div><div class="val">34 million working days lost</div><div class="desc">In 2023 alone. South Asia faces 5.6% GDP loss by 2030 from heat, more than double the global average.</div><div class="cite">ILO 2024 / RBI</div></div>
+    <div class="stat g"><div class="region">Proven model</div><div class="val">Ahmedabad HAP: 30+ cities</div><div class="desc">India already has the most replicated heat action plan in the developing world. Globe From Home builds on this momentum.</div><div class="cite">NRDC, Preparing for Deadly Heat in South Asia 2023</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Target regions</span></div>
+  <div class="sec-desc">Focus on cities identified by Rajeev and aligned with existing HAP infrastructure and C40 Cool Cities membership.</div>
+  <div class="g3">
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Ahmedabad</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Existing HAP since 2013. Cool Cities member. 7.2 million population. Strongest baseline data available.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">City 2 (TBD)</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">To be selected. Criteria: high heat vulnerability, school density, willing municipal partner, no existing HAP.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">City 3 (TBD)</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">To be selected. Potential: Rajkot (existing climate resilience plan), Jodhpur (net-zero cooling shelter), or a rural pilot.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Scale projections</span></div>
+  <div class="g2">
+    <div class="card">
+      <h4>Projected reach over 3 years</h4>
+      <div class="cw" style="height:220px"><canvas id="cp1"></canvas></div>
+      <div class="note">Conservative growth assumes 3 cities Year 1, 8 cities Year 2, 15 cities Year 3.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat o"><div class="region">Year 1</div><div class="val">5,000 learners across 3 cities</div><div class="desc">120 schools impacted. Foundation year with full data collection and M&E setup.</div></div>
+      <div class="stat o"><div class="region">Year 2</div><div class="val">18,000 learners across 8 cities</div><div class="desc">Train-the-trainer model activated. First cohort of community champions delivering independently.</div></div>
+      <div class="stat o"><div class="region">Year 3</div><div class="val">50,000 learners across 15 cities</div><div class="desc">Full scale. Partnership with state disaster management authorities. National policy influence.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== MIDDLE EAST ==================== -->
+<div id="r_middleeast" class="region-panel">
+
+<div class="hero" style="grid-template-columns:repeat(4,1fr)">
+  <div class="hero-item"><div class="val">TBD</div><div class="lbl">Learners trained</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--purple)">TBD</div><div class="lbl">Schools impacted</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--teal)">TBD</div><div class="lbl">Avg temperature reduction</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--blue)">TBD</div><div class="lbl">School attendance improvement</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Why the Middle East</span></div>
+  <div class="g3">
+    <div class="stat r"><div class="region">Extreme exposure</div><div class="val">51.8°C recorded during Hajj 2024</div><div class="desc">1,301 pilgrims died in a single event. 83% were unregistered and without access to air-conditioned facilities. Temperatures in the Gulf regularly exceed 50 degrees C.</div><div class="cite">Memish et al. 2024, Journal of Travel Medicine</div></div>
+    <div class="stat a"><div class="region">Migrant workforce</div><div class="val">35+ million migrant workers</div><div class="desc">Across the GCC, outdoor workers in construction, logistics, and services face extreme heat with limited legal protection. Many countries lack enforceable maximum temperature laws.</div><div class="cite">ILO, Heat at Work 2024</div></div>
+    <div class="stat b"><div class="region">Urbanisation pace</div><div class="val">90%+ urban population</div><div class="desc">Gulf states are among the most urbanised regions on earth. Urban heat island effects amplify already extreme ambient temperatures, creating compounding risk.</div><div class="cite">UN DESA, World Urbanization Prospects</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Target regions</span></div>
+  <div class="sec-desc">Focus on cities with high migrant worker density, extreme heat exposure, and growing political will for climate adaptation.</div>
+  <div class="g3">
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Dubai, UAE</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">COP28 host city. Midday work ban in place June to September. Large migrant construction workforce. Growing sustainability policy momentum.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Riyadh, Saudi Arabia</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Temperatures exceeding 50 degrees C. Vision 2030 includes urban greening targets. Hajj infrastructure provides existing logistics framework.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Doha, Qatar</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Post-World Cup infrastructure available. Extreme humidity compounds heat risk. Strong government capacity for pilot programmes.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Scale projections</span></div>
+  <div class="g2">
+    <div class="card">
+      <h4>Projected reach over 3 years</h4>
+      <div class="cw" style="height:220px"><canvas id="cp_me"></canvas></div>
+      <div class="note">Estimates pending. Model assumes 2 cities Year 1, 5 cities Year 2, 10 cities Year 3.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat o"><div class="region">Year 1</div><div class="val">3,000 learners across 2 cities</div><div class="desc">Focus on migrant worker communities and school systems. Baseline data collection and partner onboarding.</div></div>
+      <div class="stat o"><div class="region">Year 2</div><div class="val">12,000 learners across 5 cities</div><div class="desc">Expansion to additional Gulf states. Integration with existing midday work ban infrastructure.</div></div>
+      <div class="stat o"><div class="region">Year 3</div><div class="val">30,000 learners across 10 cities</div><div class="desc">Regional scale. Partnerships with GCC labour ministries and Hajj authorities.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== PHOENIX, ARIZONA ==================== -->
+<div id="r_phoenix" class="region-panel">
+
+<div class="hero" style="grid-template-columns:repeat(4,1fr)">
+  <div class="hero-item"><div class="val">TBD</div><div class="lbl">Learners trained</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--purple)">TBD</div><div class="lbl">Schools impacted</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--teal)">TBD</div><div class="lbl">Avg temperature reduction</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--blue)">TBD</div><div class="lbl">School attendance improvement</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Why Phoenix, Arizona</span></div>
+  <div class="g3">
+    <div class="stat r"><div class="region">Deadliest US city for heat</div><div class="val">645 heat deaths in Maricopa County (2023)</div><div class="desc">Phoenix recorded the highest heat-related death toll of any US county. The city experienced 31 consecutive days above 43 degrees C (110°F) in summer 2023.</div><div class="cite">Maricopa County Dept. of Public Health 2024</div></div>
+    <div class="stat a"><div class="region">Urban heat island</div><div class="val">Up to 5.5°C hotter than surroundings</div><div class="desc">Phoenix's sprawling, low-albedo urban footprint creates one of the most intense urban heat islands in the world. Night-time temperatures no longer cool enough for recovery.</div><div class="cite">Arizona State University, Urban Climate Research Center</div></div>
+    <div class="stat b"><div class="region">Funder relevance</div><div class="val">US-based data for US funders</div><div class="desc">Many target funders are US-based. A Phoenix pilot provides domestic proof-of-concept alongside international programmes, demonstrating that heat resilience education is needed everywhere.</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Target areas</span></div>
+  <div class="sec-desc">Focus on the communities within the Phoenix metro area with the highest heat vulnerability and lowest access to cooling.</div>
+  <div class="g3">
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">South Phoenix</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Lowest tree canopy coverage in the metro. Highest concentration of outdoor workers and low-income households. Existing community organisations to partner with.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Mesa</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Third-largest city in Arizona. Large school district. Significant agricultural worker population exposed to extreme heat during harvest seasons.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Central Phoenix</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Highest density of unsheltered population. Heat is the leading cause of death among unhoused residents. Cooling centre activation a key intervention.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Scale projections</span></div>
+  <div class="g2">
+    <div class="card">
+      <h4>Projected reach over 3 years</h4>
+      <div class="cw" style="height:220px"><canvas id="cp_phx"></canvas></div>
+      <div class="note">Urban pilot model: concentrated in one metro area with expansion to surrounding counties.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat o"><div class="region">Year 1</div><div class="val">2,000 learners across 3 districts</div><div class="desc">School partnerships and community outreach in South Phoenix and Mesa. Baseline data collection.</div></div>
+      <div class="stat o"><div class="region">Year 2</div><div class="val">8,000 learners across Maricopa County</div><div class="desc">County-wide expansion. Integration with Maricopa County heat relief network and cooling centres.</div></div>
+      <div class="stat o"><div class="region">Year 3</div><div class="val">20,000 learners across Arizona</div><div class="desc">State-level partnerships. Model available for replication in Las Vegas, Houston, and other heat-vulnerable US cities.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== KERALA ==================== -->
+<div id="r_kerala" class="region-panel">
+
+<div class="hero" style="grid-template-columns:repeat(4,1fr)">
+  <div class="hero-item"><div class="val">TBD</div><div class="lbl">Learners trained</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--purple)">TBD</div><div class="lbl">Schools impacted</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--teal)">TBD</div><div class="lbl">Avg temperature reduction</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--blue)">TBD</div><div class="lbl">School attendance improvement</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Why Kerala</span></div>
+  <div class="g3">
+    <div class="stat r"><div class="region">Humid heat danger</div><div class="val">Wet-bulb temperatures approaching survivability limits</div><div class="desc">Kerala's combination of high heat and high humidity creates wet-bulb conditions that are more dangerous than dry heat alone. The human body cannot cool itself through sweating when wet-bulb temperature exceeds 35 degrees C.</div><div class="cite">Lancet Countdown 2025; Raymond et al. 2020, Science Advances</div></div>
+    <div class="stat a"><div class="region">Compound climate risk</div><div class="val">Floods + heat in alternating seasons</div><div class="desc">Kerala experienced catastrophic floods in 2018 and 2019, followed by record heat. Communities face compounding climate shocks with diminishing recovery windows between events.</div><div class="cite">India Meteorological Department / Kerala SDMA</div></div>
+    <div class="stat g"><div class="region">Education infrastructure</div><div class="val">96%+ literacy rate</div><div class="desc">Kerala has India's strongest education system and highest civic engagement. This makes it an ideal environment for education-driven climate adaptation with high adoption potential.</div><div class="cite">Census of India / Kerala Planning Board</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Target regions</span></div>
+  <div class="sec-desc">Focus on districts with the highest compound climate risk and strongest institutional partners.</div>
+  <div class="g3">
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Thiruvananthapuram</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">State capital. High population density. Coastal humidity amplifies heat stress. Strong government and research infrastructure for pilot coordination.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Kochi</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Major port city with dense informal labour sector. Extreme humidity during pre-monsoon season. Smart City Mission participant with digital infrastructure.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏙️</div>
+      <h4 style="font-size:.9rem">Kozhikode</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Northern Kerala's largest city. Agricultural hinterland with outdoor worker exposure. Strong community-based organisation network for programme delivery.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Scale projections</span></div>
+  <div class="g2">
+    <div class="card">
+      <h4>Projected reach over 3 years</h4>
+      <div class="cw" style="height:220px"><canvas id="cp_ker"></canvas></div>
+      <div class="note">Humid heat pilot: testing interventions adapted for high-humidity environments.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat o"><div class="region">Year 1</div><div class="val">3,000 learners across 3 districts</div><div class="desc">Adapting workshop content for humid heat contexts. Partnering with Kerala SDMA and local schools.</div></div>
+      <div class="stat o"><div class="region">Year 2</div><div class="val">10,000 learners across 7 districts</div><div class="desc">District-level expansion. Integration with Kerala's existing disaster management and education networks.</div></div>
+      <div class="stat o"><div class="region">Year 3</div><div class="val">25,000 learners state-wide</div><div class="desc">Full state coverage. Model becomes reference for humid heat adaptation across South and Southeast Asia.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ==================== SMALL ISLAND NATIONS ==================== -->
+<div id="r_islands" class="region-panel">
+
+<div class="hero" style="grid-template-columns:repeat(4,1fr)">
+  <div class="hero-item"><div class="val">TBD</div><div class="lbl">Learners trained</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--purple)">TBD</div><div class="lbl">Schools impacted</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--teal)">TBD</div><div class="lbl">Avg temperature reduction</div></div>
+  <div class="hero-item"><div class="val" style="color:var(--blue)">TBD</div><div class="lbl">School attendance improvement</div></div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Why small island nations</span></div>
+  <div class="g3">
+    <div class="stat r"><div class="region">Existential climate threat</div><div class="val">1.5°C is a survival threshold</div><div class="desc">For small island developing states, climate change is not a future risk but a present emergency. Rising seas, intensifying heat, and coral bleaching threaten entire national economies and habitability.</div><div class="cite">IPCC AR6 WGII, Chapter 15: Small Islands</div></div>
+    <div class="stat a"><div class="region">Compound vulnerability</div><div class="val">Sea level rise + heat + storms</div><div class="desc">Island communities face overlapping climate risks with very limited infrastructure, healthcare capacity, and fiscal space to respond. Heat compounds every other stressor.</div><div class="cite">UNEP, Global Adaptation Gap Report 2024</div></div>
+    <div class="stat b"><div class="region">Tourism-dependent economies</div><div class="val">30 to 80% of GDP from tourism</div><div class="desc">Heat and climate impacts directly threaten the economic engine of most small island nations. Building community resilience protects both lives and livelihoods.</div><div class="cite">World Bank, SIDS Development Data</div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Target regions</span></div>
+  <div class="sec-desc">Focus on island nations with strong government engagement on climate, existing international partnerships, and scalable school systems.</div>
+  <div class="g3">
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏝️</div>
+      <h4 style="font-size:.9rem">Fiji</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">COP23 presidency. Strong climate policy leadership. 900,000 population with centralised education system. Existing partnerships with UNDP and Pacific Islands Forum.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏝️</div>
+      <h4 style="font-size:.9rem">Maldives</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">Global symbol of climate vulnerability. Extreme heat and humidity. 500,000 population. Government actively seeking climate adaptation partnerships.</div>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <div style="font-size:2rem;margin-bottom:6px">🏝️</div>
+      <h4 style="font-size:.9rem">Tuvalu</h4>
+      <div style="font-size:.75rem;color:var(--tx2);margin-top:4px">One of the most climate-vulnerable nations on earth. 11,000 population allows for whole-nation pilot. Digital statehood initiative provides unique partnership opportunity.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Scale projections</span></div>
+  <div class="g2">
+    <div class="card">
+      <h4>Projected reach over 3 years</h4>
+      <div class="cw" style="height:220px"><canvas id="cp_isl"></canvas></div>
+      <div class="note">Island model: smaller populations but whole-nation coverage possible. High visibility for global advocacy.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="stat o"><div class="region">Year 1</div><div class="val">1,500 learners across 1 nation</div><div class="desc">Single-country deep pilot (likely Fiji). Full school system integration and community training.</div></div>
+      <div class="stat o"><div class="region">Year 2</div><div class="val">5,000 learners across 3 nations</div><div class="desc">Expansion to Maldives and Tuvalu. Adaptation of content for island-specific heat and humidity contexts.</div></div>
+      <div class="stat o"><div class="region">Year 3</div><div class="val">15,000 learners across 6 nations</div><div class="desc">Pacific and Indian Ocean coverage. Model presented at UNFCCC and Pacific Islands Forum as replicable framework.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div></div>
+
+<footer><div class="w">Heat Resilience Champions &mdash; Globe From Home &copy; 2025 &middot; 24+ peer-reviewed sources &middot; <a href="https://globefromhome.com" target="_blank">globefromhome.com</a></div></footer>
+
+<script>
+function go(id,btn){document.querySelectorAll('.tc').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));document.getElementById(id).classList.add('on');btn.classList.add('on');window.scrollTo(0,0)}
+const gc='rgba(128,128,128,.1)',tc='#8590a0',bo={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+new Chart(document.getElementById('ch1'),{type:'bar',data:{labels:['Summer 2022','Summer 2023','Summer 2024'],datasets:[{data:[67873,50798,62775],backgroundColor:['#c93030','#e88080','#c93030'],borderRadius:6,barPercentage:.6}]},options:{...bo,scales:{y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>(v/1000).toFixed(0)+'k'}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+new Chart(document.getElementById('ch2'),{type:'bar',data:{labels:['1999','2005','2010','2015','2020','2023'],datasets:[{label:'Reported',data:[1069,1350,1600,1800,2100,2325],backgroundColor:'#e8612d',borderRadius:6,barPercentage:.5},{label:'Estimated',data:[2300,2670,3200,3500,4000,4500],backgroundColor:'rgba(232,97,45,.18)',borderRadius:6,barPercentage:.5}]},options:{...bo,scales:{y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v.toLocaleString()}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+new Chart(document.getElementById('ch3'),{type:'doughnut',data:{labels:['Asia (45%)','Europe (36%)','Rest of world (19%)'],datasets:[{data:[45,36,19],backgroundColor:['#c93030','#2570c0','#c07a10'],borderWidth:0,spacing:3}]},options:{...bo,cutout:'60%'}});
+new Chart(document.getElementById('ch4'),{type:'line',data:{labels:['25°C','28°C','30°C','32°C *','35°C','38°C *','40°C'],datasets:[{data:[0,5,15,40,55,67,78],borderColor:'#c93030',backgroundColor:'rgba(201,48,48,.06)',fill:true,tension:.4,pointRadius:[4,4,4,7,4,7,4],pointBackgroundColor:'#c93030',pointBorderColor:'#fff',pointBorderWidth:2}]},options:{...bo,scales:{y:{min:0,max:100,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'%'},title:{display:true,text:'Productivity loss',color:tc,font:{size:11}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+new Chart(document.getElementById('ch5'),{type:'bar',data:{labels:['Poorest 10%','10-20%','20-30%','30-40%','40-50%','50-60%','60-70%','70-80%','80-90%','Richest 10%'],datasets:[{data:[8,7.2,6.5,5.8,5.2,4.8,4.5,4.2,3.8,3.5],backgroundColor:['#7a1c1c','#993030','#c93030','#c93030','#e88080','#e88080','#f0b0b0','#f0b0b0','#f8d8d8','#f8d8d8'],borderRadius:4}]},options:{...bo,indexAxis:'y',scales:{x:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:10},callback:v=>v+'%'},title:{display:true,text:'Annual GDP per capita loss',color:tc,font:{size:10}}},y:{grid:{display:false},ticks:{color:tc,font:{size:10}}}}}});
+new Chart(document.getElementById('ch6'),{type:'bar',data:{labels:['2010','2014','2015','2016','2017','2018'],datasets:[{data:[65,11,8,15,2,3],backgroundColor:['#2570c0','#0d8a6a','#0d8a6a','#0d8a6a','#0d8a6a','#0d8a6a'],borderRadius:6,barPercentage:.55}]},options:{...bo,scales:{y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:11}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+new Chart(document.getElementById('ch7'),{type:'bar',data:{labels:['Today','2030','2050','2100'],datasets:[{label:'Deaths',data:[0.546,0.75,1.04,1.5],backgroundColor:'rgba(201,48,48,.7)',borderRadius:6,yAxisID:'y',barPercentage:.4},{label:'Cost',data:[1.09,2.4,7.9,24.7],backgroundColor:'rgba(192,122,16,.4)',borderRadius:6,yAxisID:'y1',barPercentage:.4}]},options:{...bo,scales:{y:{beginAtZero:true,position:'left',grid:{color:gc},ticks:{color:'#c93030',font:{size:10},callback:v=>v+'M'},title:{display:true,text:'Deaths (millions)',color:'#c93030',font:{size:10}}},y1:{beginAtZero:true,position:'right',grid:{display:false},ticks:{color:'#c07a10',font:{size:10},callback:v=>'$'+v+'T'},title:{display:true,text:'Economic cost',color:'#c07a10',font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+
+// Tab 3: Before vs After charts
+new Chart(document.getElementById('ba1'),{type:'bar',data:{labels:['Before','After'],datasets:[{data:[38.2,34.6],backgroundColor:['#c93030','#0d8a6a'],borderRadius:6,barPercentage:.5}]},options:{...bo,scales:{y:{min:30,max:42,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'°C'},title:{display:true,text:'Indoor temp (°C)',color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+new Chart(document.getElementById('ba2'),{type:'bar',data:{labels:['Before','After'],datasets:[{data:[62,79],backgroundColor:['#c07a10','#2570c0'],borderRadius:6,barPercentage:.5}]},options:{...bo,scales:{y:{min:40,max:100,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+'%'},title:{display:true,text:'Attendance rate',color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+new Chart(document.getElementById('ba3'),{type:'bar',data:{labels:['Before','After'],datasets:[{data:[100,69],backgroundColor:['#c93030','#0d8a6a'],borderRadius:6,barPercentage:.5}]},options:{...bo,scales:{y:{min:0,max:120,grid:{color:gc},ticks:{color:tc,font:{size:11}},title:{display:true,text:'Incidents (indexed)',color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}}});
+
+// Tab 3: Vulnerable populations
+new Chart(document.getElementById('vp1'),{type:'doughnut',data:{labels:['Children (45%)','Outdoor workers (30%)','Low-income households (25%)'],datasets:[{data:[45,30,25],backgroundColor:['#6a4fc0','#2570c0','#c07a10'],borderWidth:0,spacing:3}]},options:{...bo,cutout:'55%'}});
+
+// Tab 4: Region sub-tab switching
+function goRegion(id,btn){document.querySelectorAll('.region-panel').forEach(p=>p.classList.remove('son'));document.querySelectorAll('.subtabs button').forEach(b=>b.classList.remove('son'));document.getElementById(id).classList.add('son');btn.classList.add('son');initRegionChart(id)}
+
+// Lazy chart init for region panels (Chart.js needs visible canvas)
+const regionChartsInit={};
+function initRegionChart(id){
+if(regionChartsInit[id])return;
+regionChartsInit[id]=true;
+const scaleOpts={...bo,scales:{y:{beginAtZero:true,grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>(v/1000).toFixed(0)+'k'},title:{display:true,text:'Learners reached',color:tc,font:{size:10}}},x:{grid:{display:false},ticks:{color:tc,font:{size:11}}}}};
+if(id==='r_india'){
+new Chart(document.getElementById('cp1'),{type:'bar',data:{labels:['Year 1','Year 2','Year 3'],datasets:[{label:'Learners',data:[5000,18000,50000],backgroundColor:['rgba(232,97,45,.5)','rgba(232,97,45,.7)','rgba(232,97,45,.9)'],borderRadius:6,barPercentage:.5}]},options:scaleOpts});
+}
+if(id==='r_middleeast'){
+new Chart(document.getElementById('cp_me'),{type:'bar',data:{labels:['Year 1','Year 2','Year 3'],datasets:[{label:'Learners',data:[3000,12000,30000],backgroundColor:['rgba(201,48,48,.4)','rgba(201,48,48,.6)','rgba(201,48,48,.85)'],borderRadius:6,barPercentage:.5}]},options:scaleOpts});
+}
+if(id==='r_phoenix'){
+new Chart(document.getElementById('cp_phx'),{type:'bar',data:{labels:['Year 1','Year 2','Year 3'],datasets:[{label:'Learners',data:[2000,8000,20000],backgroundColor:['rgba(37,112,192,.4)','rgba(37,112,192,.65)','rgba(37,112,192,.9)'],borderRadius:6,barPercentage:.5}]},options:scaleOpts});
+}
+if(id==='r_kerala'){
+new Chart(document.getElementById('cp_ker'),{type:'bar',data:{labels:['Year 1','Year 2','Year 3'],datasets:[{label:'Learners',data:[3000,10000,25000],backgroundColor:['rgba(13,138,106,.4)','rgba(13,138,106,.65)','rgba(13,138,106,.9)'],borderRadius:6,barPercentage:.5}]},options:scaleOpts});
+}
+if(id==='r_islands'){
+new Chart(document.getElementById('cp_isl'),{type:'bar',data:{labels:['Year 1','Year 2','Year 3'],datasets:[{label:'Learners',data:[1500,5000,15000],backgroundColor:['rgba(106,79,192,.4)','rgba(106,79,192,.65)','rgba(106,79,192,.9)'],borderRadius:6,barPercentage:.5}]},options:scaleOpts});
+}
+}
+// Init India chart on load since it's the default visible panel
+initRegionChart('r_india');
+</script>
+</body>
+</html>
